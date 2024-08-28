@@ -72,11 +72,7 @@ def analyze_sitemap(sitemap_url):
 
 
 # Streamlit app
-st.title("Overdose Sitemap Analyzer")
-st.markdown(
-    "<p style='color:gray;'>Developed by Darren Huang. If you have any questions or found a bug, please feel free to reach out!</p>",
-    unsafe_allow_html=True
-)
+st.header("Overdose Sitemap Analyzer", divider='rainbow')
 
 analysis_type = st.radio("Choose analysis type:", ("Sitemap Index", "Sitemap File"))
 
@@ -93,7 +89,7 @@ if analysis_type == "Sitemap Index":
                 status_text = st.empty()
                 
                 for idx, sitemap in enumerate(sitemaps):
-                    status_text.text(f"({idx + 1}/{total_sitemaps}) Now Analyzing: {sitemap}")
+                    status_text.markdown(f"<span style='color:grey'>({idx + 1}/{total_sitemaps}) Now Analyzing: {sitemap}</span>", unsafe_allow_html=True)
                     url_count, top_level_dirs, urls = analyze_sitemap(sitemap)
                     sitemap_info[sitemap] = {
                         'url_count': url_count,
@@ -101,7 +97,7 @@ if analysis_type == "Sitemap Index":
                         'urls': urls  # Keep list of URLs
                     }
                     progress_bar.progress((idx + 1) / total_sitemaps)
-                status_text.text("Analysis Complete")
+                status_text.markdown("<span style='color:grey'>Analysis Complete</span>", unsafe_allow_html=True)
 
                 # Construct data for DataFrame
                 data = []
@@ -122,11 +118,18 @@ if analysis_type == "Sitemap Index":
                 df = pd.concat([sum_row.to_frame().T, df])
                 df.sort_values(by='URL Count', ascending=False, inplace=True)
                 # Display header
-                st.header("Overview of the Sitemap Index")
+                st.subheader("Overview of the Sitemap Index")
 
-                # Display DataFrame with increased width and highlighted non-zero cells
-                st.dataframe(df)
 
+                col1, col2, col3 = st.columns(3)
+                col1.metric("Number of Sitemaps", f"{total_sitemaps}")
+                col2.metric("Number of URLs", int(sum_row['URL Count']))
+                col3.metric("Number of Top Level Directories", f"{len(df.columns) - 2}")
+                
+                with st.spinner('Loading...'):
+                    # Display DataFrame with increased width and highlighted non-zero cells
+                    st.dataframe(df)
+                st.balloons()
 
                 # Construct data for URL DataFrame
                 url_data = []
@@ -146,10 +149,11 @@ if analysis_type == "Sitemap Index":
                 url_df = pd.DataFrame(url_data)
 
                 # Display header
-                st.header("All URLs")
+                st.subheader("All URLs")
 
                 # Display only the first 200 rows of the URL DataFrame
-                st.dataframe(url_df.head(200))
+                with st.spinner('Loading...'):
+                    st.dataframe(url_df.head(200))
                 st.write(f"Note: This is just a preview. The full data set has a total of {len(url_df)} URLs. Please download to see them all.")
 
                 # Provide a downloadable button for full URL DataFrame
@@ -186,11 +190,16 @@ elif analysis_type == "Sitemap File":
                 # Sort DataFrame by URL Count in descending order
                 df.sort_values(by='URL Count', ascending=False, inplace=True)
 
-                st.header("Overview of the Sitemap File")
+                st.subheader("Overview of the Sitemap File")
+
+                col1, col2 = st.columns(2)
+                col1.metric("Number of URLs", int(url_count))
+                col2.metric("Number of Top Level Directories", f"{df.shape[0]}")
 
                 # Display DataFrame
-                st.dataframe(df)
-
+                with st.spinner('Loading...'):
+                    st.dataframe(df, use_container_width=True)
+                st.balloons()
 
                 # Construct data for URL DataFrame
                 url_data = []
@@ -208,9 +217,10 @@ elif analysis_type == "Sitemap File":
                 # Create URL DataFrame
                 url_df = pd.DataFrame(url_data)
 
-                st.header("All URLs")
+                st.subheader("All URLs")
                 # Display only the first 200 rows of the URL DataFrame
-                st.dataframe(url_df.head(200))
+                with st.spinner('Loading...'):
+                    st.dataframe(url_df.head(200))
                 st.write(f"Note: This is just a preview. The full data set has a total of {len(url_df)} URLs. Please download to see them all.")
 
                 # Provide a downloadable button for full URL DataFrame
@@ -228,3 +238,6 @@ elif analysis_type == "Sitemap File":
         else:
             st.error("Please enter a valid Sitemap URL.")
             st.write("The website might have some bot detection that prevents the script from working.")
+
+st.divider()
+st.info("Developed by Darren Huang. If you have any questions or found a bug, please feel free to reach out!", icon="ℹ️")
