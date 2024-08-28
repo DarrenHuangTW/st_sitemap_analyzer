@@ -177,27 +177,27 @@ elif analysis_type == "Sitemap File":
     if st.button("Run Analysis"):
         if sitemap_url:
             try:
-                url_count, top_level_dirs, urls = analyze_sitemap(sitemap_url)
-                st.write(f"Found {int(url_count)} URLs in the sitemap.")  # Ensure URL Count has no decimal points
-
-                # Construct data for DataFrame
-                data = [{'Top-Level Directory': dir, 'URL Count': int(count)} for dir, count in top_level_dirs.items()]  # Ensure URL Count has no decimal points
-
-                # Create DataFrame
-                df = pd.DataFrame(data)
-                df.set_index('Top-Level Directory', inplace=True)
-
-                # Sort DataFrame by URL Count in descending order
-                df.sort_values(by='URL Count', ascending=False, inplace=True)
-
-                st.subheader("Overview of the Sitemap File")
-
-                col1, col2 = st.columns(2)
-                col1.metric("Number of URLs", int(url_count))
-                col2.metric("Number of Top Level Directories", f"{df.shape[0]}")
-
-                # Display DataFrame
                 with st.spinner('Loading...'):
+                    url_count, top_level_dirs, urls = analyze_sitemap(sitemap_url)
+                    st.write(f"Found {int(url_count)} URLs in the sitemap.")  # Ensure URL Count has no decimal points
+
+                    # Construct data for DataFrame
+                    data = [{'Top-Level Directory': dir, 'URL Count': int(count)} for dir, count in top_level_dirs.items()]  # Ensure URL Count has no decimal points
+
+                    # Create DataFrame
+                    df = pd.DataFrame(data)
+                    df.set_index('Top-Level Directory', inplace=True)
+
+                    # Sort DataFrame by URL Count in descending order
+                    df.sort_values(by='URL Count', ascending=False, inplace=True)
+
+                    st.subheader("Overview of the Sitemap File")
+
+                    col1, col2 = st.columns(2)
+                    col1.metric("Number of URLs", int(url_count))
+                    col2.metric("Number of Top Level Directories", f"{df.shape[0]}")
+
+                    # Display DataFrame
                     st.dataframe(df, use_container_width=True)
                 st.balloons()
 
