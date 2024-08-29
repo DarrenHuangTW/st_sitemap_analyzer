@@ -99,17 +99,17 @@ if analysis_type == "Sitemap Index":
                     
                     excluded_sitemaps = total_sitemaps - len(all_sitemaps)
                     
-                    st.write(f"Found {total_sitemaps} sitemap files across {len(sitemap_indexes)} sitemap index(es).")
+                    st.write(f"Discovered {total_sitemaps} sitemap files across {len(sitemap_indexes)} sitemap index(es).")
                     if excluded_sitemaps > 0:
-                        st.write(f"{excluded_sitemaps} sitemaps were excluded from the analysis.")
-                    st.write(f"Analyzing {len(all_sitemaps)} sitemap files.")
-                    
+                        st.write(f"Excluded {excluded_sitemaps} sitemaps from the analysis.")
+                    st.write(f"Analyzing {len(all_sitemaps)} sitemap files. Please wait...")
+
                     sitemap_info = {}
                     progress_bar = st.progress(0)
                     status_text = st.empty()
                     
                     for idx, sitemap in enumerate(all_sitemaps):
-                        status_text.markdown(f"<span style='color:grey'>({idx + 1}/{len(all_sitemaps)}) Now Analyzing: {sitemap}</span>", unsafe_allow_html=True)
+                        status_text.markdown(f"<span style='color:grey'>({idx + 1}/{len(all_sitemaps)}) Analyzing: {sitemap}</span>", unsafe_allow_html=True)
                         url_count, top_level_dirs, urls = analyze_sitemap(sitemap)
                         sitemap_info[sitemap] = {
                             'url_count': url_count,
@@ -139,7 +139,7 @@ if analysis_type == "Sitemap Index":
                     df = pd.concat([sum_row.to_frame().T, df])
                     df.sort_values(by='URL Count', ascending=False, inplace=True)
                     # Display header
-                    st.subheader("Overview of the Analysis")
+                    st.subheader("Analysis Overview")
 
 
                     col1, col2, col3, col4 = st.columns(4)
@@ -176,7 +176,7 @@ if analysis_type == "Sitemap Index":
                     # Display only the first 200 rows of the URL DataFrame
                     with st.spinner('Loading...'):
                         st.dataframe(url_df.head(200))
-                    st.write(f"Note: This is just a preview. The full data set has a total of {len(url_df)} URLs. Please download to see them all.")
+                    st.write(f"Note: This is just a preview. The full dataset contains {len(url_df)} URLs. Please download to see them all.")
 
                     # Provide a downloadable button for full URL DataFrame
                     url_csv = url_df.to_csv().encode('utf-8')
@@ -203,14 +203,14 @@ elif analysis_type == "Sitemap File(s)":
             sitemaps = [url.strip() for url in sitemap_urls.split('\n') if url.strip()]
             if len(sitemaps) > 0:
                 try:
-                    st.write(f"Found {len(sitemaps)} sitemap file(s).")
+                    st.write(f"Discovered {len(sitemaps)} sitemap file(s).")
                     sitemap_info = {}
                     progress_bar = st.progress(0)
                     total_sitemaps = len(sitemaps)
                     status_text = st.empty()
                     
                     for idx, sitemap in enumerate(sitemaps):
-                        status_text.markdown(f"<span style='color:grey'>({idx + 1}/{total_sitemaps}) Now Analyzing: {sitemap}</span>", unsafe_allow_html=True)
+                        status_text.markdown(f"<span style='color:grey'>({idx + 1}/{total_sitemaps}) Analyzing: {sitemap}</span>", unsafe_allow_html=True)
                         url_count, top_level_dirs, urls = analyze_sitemap(sitemap)
                         sitemap_info[sitemap] = {
                             'url_count': url_count,
@@ -240,7 +240,7 @@ elif analysis_type == "Sitemap File(s)":
                     df.sort_values(by='URL Count', ascending=False, inplace=True)
                     
                     # Display header
-                    st.subheader("Overview of the Analysis")
+                    st.subheader("Analysis Overview")
 
                     col1, col2, col3 = st.columns(3)
                     col1.metric("Number of Sitemaps", f"{total_sitemaps}")
@@ -275,7 +275,7 @@ elif analysis_type == "Sitemap File(s)":
                     # Display only the first 200 rows of the URL DataFrame
                     with st.spinner('Loading...'):
                         st.dataframe(url_df.head(200))
-                    st.write(f"Note: This is just a preview. The full data set has a total of {len(url_df)} URLs. Please download to see them all.")
+                    st.write(f"Note: This is just a preview. The full dataset contains {len(url_df)} URLs. Please download to see them all.")
 
                     # Provide a downloadable button for full URL DataFrame
                     url_csv = url_df.to_csv().encode('utf-8')
